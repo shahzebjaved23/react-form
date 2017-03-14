@@ -1,29 +1,39 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import countries from './countries.json';
 
 class Form extends Component {
+
+	// class constructor
 	constructor(props) {
 	    super(props);
+	    // sets the initial state
 		this.state = {
 			countries: []
 		};
 	}
 
-	getCountries(){
-		console.log("get countries called");
-		$(this.refs.spinner).show();
-		$.getJSON('https://restcountries.eu/rest/v2/all',function(data){
-			this.setState({
-				countries: data
-			});
-			$(this.refs.spinner).hide();
-		}.bind(this))
-	}
+	// action to get the countries from api, (not being called at the moment)
+	// getCountries(){
+	// 	console.log("get countries called");
+	// 	$(this.refs.spinner).show();
+	// 	$.getJSON('https://restcountries.eu/rest/v2/all',function(data){
+	// 		this.setState({
+	// 			countries: data
+	// 		});
+	// 		$(this.refs.spinner).hide();
+	// 	}.bind(this))
+	// }
 
+	// action, to handle the form submission
 	handleSubmit(e){
+		// prevents the page reload, default for form submission
 		e.preventDefault();
 
+		// show the spinner
 		$(this.refs.spinner).show();
+
+		// prepares the data to be sent, from refs on the form inputs
 		var sendData = {
 			ContactChanell: "contact page",
 			email: this.refs.email.value,
@@ -33,37 +43,59 @@ class Form extends Component {
 			countryCode: this.refs.countryCode.value
 		}
 
+		// makes the ajax call on the jquery object
 		$.ajax({
 			url: "some.com",
 		   	type: 'POST',
 		   	data: sendData,
+		   	// called when the request is successfull
 		   	success: function(response) {
-		   		$(this.refs.spinner).hide();
-		    	alert("message sent");
+		   		// shows the success message
+		   		$(this.refs.success_message).show();
+		   		// hides the form
+		   		$(this.refs.form).hide();
+		   		// hide the spinner
+		    	$(this.refs.spinner).hide();
 		   	}.bind(this),
+		   	// called when the request fails
 		   	error:function (e){
-			    if(e.status == 404) {
-			        alert("message failed");
-			    }
+		   		// shows the failure message
+			    $(this.refs.failure_message).show();
+			    // hides the spinner
 			    $(this.refs.spinner).hide();
+			    // hides the form
+			    $(this.refs.form).hide();
 			}.bind(this)
 		});	
 	}
 
+	// life cycle method, gets called after component mounted in the DOM
+	// hides the spinnes and messages, so that they are hidden when the page loads
 	componentDidMount(){
+		// hides the spinner
 		$(this.refs.spinner).hide();
-		this.getCountries();
+		//this.getCountries();
+
+		// hides the messages
+		$(this.refs.success_message).hide();
+		$(this.refs.failure_message).hide();
 	}
 
-	componentWillMount(){
-		this.getCountries();
-	}
 
 	render() {
 		return (
 		  <div>
+		  	<div ref="success_message">
+			  	<h1>Message Sent Successfully</h1>
+			</div>
+			
+			<div ref="failure_message">
+			  	<h1>Message Failed</h1>
+			</div>
+
 		  	<img alt="spinner" ref="spinner" src="./4.gif" className="img img-responsive" style={{position: "fixed",zIndex: 999,overflow: "show",margin: "auto",top: 0,left: 0,bottom: 0,right: 0}}/>
-		  	<form onSubmit={this.handleSubmit.bind(this)}>
+		  	
+		  	<form ref="form" onSubmit={this.handleSubmit.bind(this)}>
 		  		<input name="ContactChanell" value="contact page" type="hidden"/>
 
 		  		<label>Email</label>
@@ -81,15 +113,14 @@ class Form extends Component {
 		  		<label>Country</label>
 		  		<select ref="countryCode">
 		  			{
-		  				this.state.countries.map(function(country){
+		  				// loops through the countries to get options for select
+		  				countries.map(function(country){
 		  					return <option value={country.alpha2Code}>{country.name}</option>
 		  				})
 		  			}
 		  		</select>
 
 		  		<input type="submit"/>
-
-
 		  	</form>
 		  </div>  
 		);
