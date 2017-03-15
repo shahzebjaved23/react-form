@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
-import countries from './countries.json';
 
 class Form extends Component {
 
@@ -68,7 +67,7 @@ class Form extends Component {
 		$(this.refs.success_message).hide();
 		$(this.refs.failure_message).hide();
 		
-		// use an api to get users country, and set it in component state
+		// uses an api to get users country, and set it in component state
 		$.getJSON("https://ipinfo.io", function(response) {
 		    this.setState({
 		    	countryCode: response.country
