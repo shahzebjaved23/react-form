@@ -9,21 +9,10 @@ class Form extends Component {
 	    super(props);
 	    // sets the initial state
 		this.state = {
-			countries: []
+			countries: [],
+			countryCode: null
 		};
 	}
-
-	// action to get the countries from api, (not being called at the moment)
-	// getCountries(){
-	// 	console.log("get countries called");
-	// 	$(this.refs.spinner).show();
-	// 	$.getJSON('https://restcountries.eu/rest/v2/all',function(data){
-	// 		this.setState({
-	// 			countries: data
-	// 		});
-	// 		$(this.refs.spinner).hide();
-	// 	}.bind(this))
-	// }
 
 	// action, to handle the form submission
 	handleSubmit(e){
@@ -32,7 +21,7 @@ class Form extends Component {
 
 		// show the spinner
 		$(this.refs.spinner).show();
-
+		
 		// prepares the data to be sent, from refs on the form inputs
 		var sendData = {
 			ContactChanell: "contact page",
@@ -40,7 +29,7 @@ class Form extends Component {
 			phoneNumber: this.refs.phoneNumber.value,
 			companyName: this.refs.companyName.value,
 			contactName: this.refs.contactName.value,
-			countryCode: this.refs.countryCode.value
+			countryCode: this.state.countryCode
 		}
 
 		// makes the ajax call on the jquery object
@@ -74,11 +63,17 @@ class Form extends Component {
 	componentDidMount(){
 		// hides the spinner
 		$(this.refs.spinner).hide();
-		//this.getCountries();
-
+		
 		// hides the messages
 		$(this.refs.success_message).hide();
 		$(this.refs.failure_message).hide();
+		
+		// use an api to get users country, and set it in component state
+		$.getJSON("https://ipinfo.io", function(response) {
+		    this.setState({
+		    	countryCode: response.country
+		    })
+		}.bind(this))
 	}
 
 
@@ -110,15 +105,7 @@ class Form extends Component {
 		  		<label>Contact Name</label>
 		  		<input type="text" ref="contactName"/>
 
-		  		<label>Country</label>
-		  		<select ref="countryCode">
-		  			{
-		  				// loops through the countries to get options for select
-		  				countries.map(function(country){
-		  					return <option value={country.alpha2Code}>{country.name}</option>
-		  				})
-		  			}
-		  		</select>
+		  		<input type="hidden" ref="countryCode"/>
 
 		  		<input type="submit"/>
 		  	</form>
